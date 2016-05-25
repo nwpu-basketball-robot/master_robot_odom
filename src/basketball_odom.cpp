@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-//author : rescuer liao
-//https://github.com/rescuer-liao
-//date : 2016 - 1 - 22
-//Team Explorer(rescue robot)
-//Team Unware (NWPU Basketball robot)
-//this package get odometry data from handware and send these data to tf_tree and ros stack
-=======
 /*
 *Team Unware Basketball Robot NWPU
 *
@@ -16,20 +8,14 @@
 *first_debug_date:2016-01-20
 *测试通过
 */
->>>>>>> 0b6064f447f1e965e3bb077a8ed15cc56c5b3df3
 
 #include <basketball_odom/basketball_odom.h>
 #include <tf/tf.h>
 #include <sstream>
 #include <geometry_msgs/Quaternion.h>
-<<<<<<< HEAD
-
-//#define DEBUG
-=======
 //#define DEBUG
 
 
->>>>>>> 0b6064f447f1e965e3bb077a8ed15cc56c5b3df3
 RobotOdom::RobotOdom(ros::NodeHandle &node):
     nh_(node),
     last_time_(ros::Time::now()),
@@ -42,11 +28,7 @@ RobotOdom::RobotOdom(ros::NodeHandle &node):
     base_cmd_id_(0x01)
 {
     odom_pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 50) ;
-<<<<<<< HEAD
-    odom_request_pub_ = nh_.advertise<basketball_msgs::robot_message>("robot_cmd",1000) ;
-=======
     odom_request_pub_ = nh_.advertise<basketball_msgs::robot_message>("robot_cmd",10) ;
->>>>>>> 0b6064f447f1e965e3bb077a8ed15cc56c5b3df3
     std::stringstream sub_name ;
     sub_name<<"/RecvData/"<<(int)base_cmd_id_ ;
     odom_data_sub_ = nh_.subscribe(sub_name.str(),100, &RobotOdom::odomCallBack,this) ;
@@ -60,10 +42,7 @@ RobotOdom::~RobotOdom()
 
 void RobotOdom::pubOdomRequest(const uint8_t func)
 {
-<<<<<<< HEAD
-=======
   //转化为下位机协议
->>>>>>> 0b6064f447f1e965e3bb077a8ed15cc56c5b3df3
 	basketball_msgs::robot_message robot_cmd_msg ;
 	robot_cmd_msg.data.resize(6 , 0) ;
 	uint8_t *data_ptr = robot_cmd_msg.data.data() ;
@@ -71,14 +50,9 @@ void RobotOdom::pubOdomRequest(const uint8_t func)
 	data_ptr[0] = data_ptr[1] = 0xff ;
 	data_ptr[2] = base_cmd_id_ ;
 	data_ptr[3] = (u_int8_t)(data_len>>8) ;
-<<<<<<< HEAD
-    data_ptr[4] = (u_int8_t)(data_len & 0xff) ;
-    data_ptr[5] = func ;
-=======
   data_ptr[4] = (u_int8_t)(data_len & 0xff) ;
   data_ptr[5] = func ;
   //转化完成
->>>>>>> 0b6064f447f1e965e3bb077a8ed15cc56c5b3df3
 	odom_request_pub_.publish(robot_cmd_msg) ;
 }
 
@@ -96,11 +70,7 @@ void RobotOdom::setOdomVelocity(double d_x , double d_y , double d_z,nav_msgs::O
 
 void RobotOdom::mainRun()
 {
-<<<<<<< HEAD
     ros::Rate r(10) ;
-=======
-    ros::Rate r(100) ;
->>>>>>> 0b6064f447f1e965e3bb077a8ed15cc56c5b3df3
     while(ros::ok())
     {
         pubOdom(current_x_ , current_y_ , current_yaw_) ;
@@ -109,13 +79,8 @@ void RobotOdom::mainRun()
         last_y_ = current_y_ ;
         last_yaw_ = current_yaw_ ;
         last_time_ = ros::Time::now() ;
-<<<<<<< HEAD
-        pubOdomRequest(0x04) ;
-        r.sleep() ;
-=======
 	       pubOdomRequest(0x04) ;
 	        r.sleep() ;
->>>>>>> 0b6064f447f1e965e3bb077a8ed15cc56c5b3df3
         ros::spinOnce() ;
     }
 }
@@ -159,15 +124,9 @@ void RobotOdom::odomCallBack(const basketball_msgs::robot_state::ConstPtr &ptr)
     double y = ptr->data.at(1) ;
     double yaw = ptr->data.at(2) ;
     #ifdef DEBUG
-<<<<<<< HEAD
-        ROS_INFO("the id is %d\n" , ptr->id) ;
-        ROS_INFO("current length is %d ,  current odom is x = %lf , y = %lf , yaw = %lf\n" , ptr->data.size(),  x , y ,yaw) ;
-    #endif // DEBUG
-=======
       ROS_INFO("the id is %d\n" , ptr->id) ;
       ROS_INFO("current length is %d ,  current odom is x = %lf , y = %lf , yaw = %lf\n" , ptr->data.size(),  x , y ,yaw) ;
     #endif
->>>>>>> 0b6064f447f1e965e3bb077a8ed15cc56c5b3df3
     current_x_ = x ;
     current_y_ = y ;
     current_yaw_ = yaw ;
