@@ -28,7 +28,7 @@ RobotOdom::RobotOdom(ros::NodeHandle &node):
     base_cmd_id_(0x01)
 {
     odom_pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 50) ;
-    odom_request_pub_ = nh_.advertise<basketball_msgs::robot_message>("robot_cmd",10) ;
+    odom_request_pub_ = nh_.advertise<basketball_msgs::robot_message>("robot_cmd",100) ;
     std::stringstream sub_name ;
     sub_name<<"/RecvData/"<<(int)base_cmd_id_ ;
     odom_data_sub_ = nh_.subscribe(sub_name.str(),100, &RobotOdom::odomCallBack,this) ;
@@ -50,8 +50,8 @@ void RobotOdom::pubOdomRequest(const uint8_t func)
 	data_ptr[0] = data_ptr[1] = 0xff ;
 	data_ptr[2] = base_cmd_id_ ;
 	data_ptr[3] = (u_int8_t)(data_len>>8) ;
-  data_ptr[4] = (u_int8_t)(data_len & 0xff) ;
-  data_ptr[5] = func ;
+  	data_ptr[4] = (u_int8_t)(data_len & 0xff) ;
+	data_ptr[5] = func ;
   //转化完成
 	odom_request_pub_.publish(robot_cmd_msg) ;
 }
@@ -119,17 +119,21 @@ void RobotOdom::odomBroadcaster(const double x , const double y , const double y
 
 //get the odometry data from handware and send these data to navigation stack
 void RobotOdom::odomCallBack(const basketball_msgs::robot_state::ConstPtr &ptr)
-{
-    double x = ptr->data.at(0) ;
-    double y = ptr->data.at(1) ;
-    double yaw = ptr->data.at(2) ;
-    #ifdef DEBUG
-      ROS_INFO("the id is %d\n" , ptr->id) ;
-      ROS_INFO("current length is %d ,  current odom is x = %lf , y = %lf , yaw = %lf\n" , ptr->data.size(),  x , y ,yaw) ;
-    #endif
-    current_x_ = x ;
-    current_y_ = y ;
-    current_yaw_ = yaw ;
+{	
+	// 2016-6-12 清零里程计下位机会返回一个内容为两个字节的数据包，为了过滤掉这个数据包，就加上了这样的判断
+	if(ptr->data.size()==3) 
+	{    
+		double x = ptr->data.at(0) ;
+		double y = ptr->data.at(1) ;
+		double yaw = ptr->data.at(2) ;
+    	#ifdef DEBUG
+    	  ROS_INFO("the id is %d\n" , ptr->id) ;
+	      ROS_INFO("current length is %d ,  current odom is x = %lf , y = %lf , yaw = %lf\n" , ptr->data.size(),  x , y ,yaw) ;
+	    #endif
+	    current_x_ = x ;
+	    current_y_ = y ;
+	    current_yaw_ = yaw ;
+	}
 }
 
 int main(int argc , char **argv)
